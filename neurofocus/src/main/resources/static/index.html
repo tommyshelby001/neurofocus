@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NeuroFocus AI Dashboard</title>
+
+    ```
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #020617;
+            padding: 25px;
+            border-radius: 12px;
+            width: 350px;
+            margin: auto;
+            margin-top: 40px;
+            box-shadow: 0 0 15px #38bdf8;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            background: #38bdf8;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #111;
+            border-radius: 8px;
+        }
+    </style>
+    ```
+
+</head>
+
+<body>
+
+<h1>🤖 NeuroFocus AI Dashboard</h1>
+
+<div class="card">
+
+    ```
+    <h3>🔐 Login</h3>
+
+    <input type="text" id="email" placeholder="Enter Email">
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+
+    <hr>
+
+    <h3>🎯 Focus</h3>
+
+    <input type="number" id="userId" placeholder="User ID">
+
+    <button onclick="startFocus()">Start Focus</button>
+    <button onclick="endFocus()">End Focus</button>
+
+    <hr>
+
+    <button onclick="getSmartAdvice()">AI Advice 🤖</button>
+
+    <div id="result"></div>
+    ```
+
+</div>
+
+<script>
+
+    function show(msg) {
+        document.getElementById("result").innerText = msg;
+    }
+
+    // 🔐 REGISTER
+    function register() {
+        fetch('/register', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                name: "User",
+                email: email.value,
+                password: password.value
+            })
+        })
+        .then(() => show("Registered Successfully ✅"));
+    }
+
+    // 🔐 LOGIN
+    function login() {
+        fetch('/login', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value
+            })
+        })
+        .then(res => res.text())
+        .then(data => {
+
+            if(data.startsWith("LOGIN_SUCCESS")){
+                let id = data.split(":")[1];
+
+                localStorage.setItem("userId", id);
+                document.getElementById("userId").value = id;
+
+                show("Login Successful 🔥");
+            } else {
+                show("Login Failed ❌");
+            }
+
+        });
+    }
+
+    // 🎯 START
+    function startFocus() {
+        let id = localStorage.getItem("userId");
+        fetch(`/start-focus/${id}`, {method:"POST"})
+        .then(() => show("Focus Started ✅"));
+    }
+
+    // 🎯 END
+    function endFocus() {
+        let id = localStorage.getItem("userId");
+        fetch(`/end-focus/${id}`, {method:"POST"})
+        .then(() => show("Focus Ended 🛑"));
+    }
+
+    // 🤖 AI ADVICE FUNCTION
+    function getSmartAdvice() {
+        let id = localStorage.getItem("userId");
+
+        fetch(`/smart-advice/${id}`)
+        .then(res => res.text())
+        .then(data => show(data));
+    }
+
+</script>
+
+</body>
+</html>
