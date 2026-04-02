@@ -1,169 +1,170 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>NeuroFocus AI Dashboard</title>
 
-    ```
     <style>
         body {
-            background: #0f172a;
-            color: white;
             font-family: Arial;
+            background: #0b1c3d;
+            color: white;
             text-align: center;
         }
 
-        h1 {
-            color: #38bdf8;
-            margin-top: 20px;
-        }
-
-        .card {
-            background: #020617;
-            padding: 25px;
-            border-radius: 12px;
+        .container {
+            margin: 50px auto;
             width: 350px;
-            margin: auto;
-            margin-top: 40px;
-            box-shadow: 0 0 15px #38bdf8;
+            padding: 20px;
+            border-radius: 15px;
+            background: #020d2b;
+            box-shadow: 0 0 20px cyan;
         }
 
         input {
             width: 90%;
             padding: 10px;
-            margin: 10px;
+            margin: 8px;
             border-radius: 8px;
             border: none;
         }
 
         button {
             padding: 10px 15px;
-            margin: 5px;
-            border: none;
+            margin: 8px;
             border-radius: 8px;
-            background: #38bdf8;
-            color: black;
-            font-weight: bold;
+            border: none;
+            background: #2ec4f1;
             cursor: pointer;
         }
 
-        button:hover {
-            background: #0ea5e9;
-        }
-
         #result {
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 10px;
             background: #111;
             border-radius: 8px;
         }
     </style>
-    ```
-
 </head>
 
 <body>
 
 <h1>🤖 NeuroFocus AI Dashboard</h1>
 
-<div class="card">
+<div class="container">
 
-    ```
-    <h3>🔐 Login</h3>
+    <!-- LOGIN -->
+    <h2>🔐 Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
 
-    <input type="text" id="email" placeholder="Enter Email">
-    <input type="password" id="password" placeholder="Enter Password">
-
+    <br>
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
 
     <hr>
 
-    <h3>🎯 Focus</h3>
-
+    <!-- FOCUS -->
+    <h2>🎯 Focus</h2>
     <input type="number" id="userId" placeholder="User ID">
 
+    <br>
     <button onclick="startFocus()">Start Focus</button>
     <button onclick="endFocus()">End Focus</button>
 
     <hr>
 
-    <button onclick="getSmartAdvice()">AI Advice 🤖</button>
+    <!-- AI ADVICE -->
+    <button onclick="getAdvice()">AI Advice 🤖</button>
 
     <div id="result"></div>
-    ```
 
 </div>
 
 <script>
 
-    function show(msg) {
-        document.getElementById("result").innerText = msg;
-    }
-
-    // 🔐 REGISTER
+    // REGISTER
     function register() {
-        fetch('/register', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                name: "User",
-                email: email.value,
-                password: password.value
-            })
-        })
-        .then(() => show("Registered Successfully ✅"));
-    }
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-    // 🔐 LOGIN
-    function login() {
-        fetch('/login', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                email: email.value,
-                password: password.value
-            })
+        fetch("/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email, password})
         })
         .then(res => res.text())
         .then(data => {
-
-            if(data.startsWith("LOGIN_SUCCESS")){
-                let id = data.split(":")[1];
-
-                localStorage.setItem("userId", id);
-                document.getElementById("userId").value = id;
-
-                show("Login Successful 🔥");
-            } else {
-                show("Login Failed ❌");
-            }
-
+            alert(data);
         });
     }
 
-    // 🎯 START
-    function startFocus() {
-        let id = localStorage.getItem("userId");
-        fetch(`/start-focus/${id}`, {method:"POST"})
-        .then(() => show("Focus Started ✅"));
-    }
+    // LOGIN
+    function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-    // 🎯 END
-    function endFocus() {
-        let id = localStorage.getItem("userId");
-        fetch(`/end-focus/${id}`, {method:"POST"})
-        .then(() => show("Focus Ended 🛑"));
-    }
-
-    // 🤖 AI ADVICE FUNCTION
-    function getSmartAdvice() {
-        let id = localStorage.getItem("userId");
-
-        fetch(`/smart-advice/${id}`)
+        fetch("/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email, password})
+        })
         .then(res => res.text())
-        .then(data => show(data));
+        .then(data => {
+            alert(data);
+        });
+    }
+
+    // START FOCUS
+    function startFocus() {
+        const userId = document.getElementById("userId").value;
+
+        if (!userId) {
+            alert("Enter User ID");
+            return;
+        }
+
+        fetch(`/focus/start/${userId}`)
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("result").innerText = data;
+            });
+    }
+
+    // END FOCUS
+    function endFocus() {
+        const userId = document.getElementById("userId").value;
+
+        if (!userId) {
+            alert("Enter User ID");
+            return;
+        }
+
+        fetch(`/focus/end/${userId}`)
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("result").innerText = data;
+            });
+    }
+
+    // AI ADVICE (FIXED)
+    function getAdvice() {
+        const userId = document.getElementById("userId").value;
+
+        if (!userId) {
+            alert("Please enter User ID");
+            return;
+        }
+
+        fetch(`/smart-advice/${userId}`)
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("result").innerText = data;
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById("result").innerText = "Error getting advice";
+            });
     }
 
 </script>
