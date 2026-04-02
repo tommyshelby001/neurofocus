@@ -5,8 +5,7 @@ import java.util.List;
 
 public interface FocusSessionRepository extends JpaRepository<FocusSession, Integer> {
 
-    // 🔥 REQUIRED FOR PRODUCTIVITY SCORE
     List<FocusSession> findByUserId(int userId);
     List<FocusSession> findByUserIdOrderByStartTimeAsc(int userId);
-    List<FocusSession> findAll();
+
 }
